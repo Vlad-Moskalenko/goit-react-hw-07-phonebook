@@ -1,28 +1,37 @@
-import { ContactForm } from './ContactForm';
-import { Filter } from './Filter';
-import { ContactList } from './ContactList';
-import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchContacts } from 'redux/operations';
-import { getError, getIsLoading } from 'redux/selectors';
+import { Section } from './Section/Section';
+import { ContactForm } from './ContactForm/ContactForm';
+import { ContactsList } from './ContactsList/ContactsList';
+import { Filter } from './Filter/Filter';
 
-export function App() {
+import { fetchContacts } from 'redux/operations';
+
+import { useDispatch, useSelector } from 'react-redux';
+import { selectContacts } from 'redux/selectors';
+import { useEffect } from 'react';
+
+export const App = () => {
   const dispatch = useDispatch();
-  const isLoading = useSelector(getIsLoading);
-  const error = useSelector(getError);
+  const { isLoading, error } = useSelector(selectContacts);
 
   useEffect(() => {
     dispatch(fetchContacts());
   }, [dispatch]);
 
   return (
-    <div className="app-wrapper">
-      <h1>Phonebook</h1>
-      <ContactForm />
-      <h2>Contacts</h2>
-      <Filter />
-      {isLoading && !error && <b>Loading...</b>}
-      <ContactList />
-    </div>
+    <main className="app-wrapper">
+      <Section title="Phonebook">
+        <ContactForm />
+      </Section>
+      <Section title={isLoading && !error ? 'Wait a minute...' : 'Contacts'}>
+        {!error ? (
+          <>
+            <Filter />
+            <ContactsList />
+          </>
+        ) : (
+          <p>Oops, something went wrong...</p>
+        )}
+      </Section>
+    </main>
   );
-}
+};
